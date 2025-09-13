@@ -1,0 +1,3 @@
+[project.scripts]
+networkflow = "networkflow.cli:cli"
+

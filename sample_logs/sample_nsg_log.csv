@@ -1,0 +1,5 @@
+timestamp,src_ip,src_port,dst_ip,dst_port,protocol,flow_decision,flow_state,packets,bytes
+2025-09-01T00:00:00Z,10.0.0.1,443,13.91.0.1,53244,TCP,Allow,Established,10,1500
+2025-09-01T00:10:00Z,10.0.0.2,123,13.91.0.2,80,TCP,Deny,Closed,2,120
+2025-09-01T01:00:00Z,10.0.0.1,443,8.8.8.8,53,UDP,Allow,Established,5,400
+
