@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: networkflow
+Version: 0.1.0
+Summary: NSG flow log analytics dashboard
+Author-email: Tejasri <tejassri.thalloju117@gmail.com>
+Description-Content-Type: text/markdown
+Requires-Dist: pandas
+Requires-Dist: dash
+Requires-Dist: plotly
+Requires-Dist: azure-storage-blob
+Requires-Dist: tenacity
+Requires-Dist: click

@@ -1,25 +1,20 @@
-# Multi-stage build to keep runtime image small
-FROM python:3.11-slim AS build
-
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gcc \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.13-slim
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
 
-COPY . .
+# Install system + Python dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir click pandas dash plotly azure-storage-blob azure-identity tenacity \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-FROM python:3.11-slim AS runtime
-WORKDIR /app
+# Add project to PYTHONPATH
+ENV PYTHONPATH=/app
 
-# copy installed packages and app
-COPY --from=build /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=build /app /app
+# Default command
+CMD ["python", "-m", "networkflow.cli"]
 
-EXPOSE 8050
-ENTRYPOINT ["python", "-m", "networkflow.cli", "dashboard"]
 
+# ✅ CMD: default to launching the dashboard
+CMD ["dashboard"]

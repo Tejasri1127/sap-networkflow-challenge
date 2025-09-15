@@ -1,31 +1,28 @@
 import click
-from .parsers import get_container_client, iter_csv_dfs_from_container
-from .dashboard_app import create_dash_app
 import pandas as pd
+from networkflow.parsers import get_container_client, iter_csv_dfs_from_container, normalize_df_columns
+from networkflow.dashboard_app import create_dash_app
 
+# 1️⃣ Define the CLI group first
 @click.group()
 def cli():
+    """Network Flow CLI"""
     pass
 
-@cli.command('dashboard')
-@click.option('--storage-account', required=True)
-@click.option('--container', required=True)
-@click.option('--sas-token', default=None)
-@click.option('--host', default='0.0.0.0')
-@click.option('--port', default=8050)
-def dashboard(storage_account, container, sas_token, host, port):
-    """Launch dashboard using data from Azure Blob storage."""
-    cc = get_container_client(storage_account, container, sas_token)
-    dfs = []
-    for df in iter_csv_dfs_from_container(cc):
-        dfs.append(df)
-    if not dfs:
-        click.echo('No CSV logs found in container.')
-        return
-    full = pd.concat(dfs, ignore_index=True)
-    app = create_dash_app(lambda: full)
-    app.run_server(host=host, port=port, debug=False)
+# 2️⃣ Add commands AFTER cli() is defined
+@cli.command()
+@click.option("--storage-account", required=True)
+@click.option("--container", required=True)
+@click.option("--sas-token", default=None)
+def dashboard(storage_account, container, sas_token):
+    """Run the Dash dashboard."""
+    container_client = get_container_client(storage_account, container, sas_token)
+    dfs = [normalize_df_columns(df) for df in iter_csv_dfs_from_container(container_client)]
+    data = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+    app = create_dash_app(lambda: data)
+    app.run(host="0.0.0.0", port=8050, debug=True)
 
-if __name__ == '__main__':
+# 3️⃣ Main entry point
+if __name__ == "__main__":
     cli()
 

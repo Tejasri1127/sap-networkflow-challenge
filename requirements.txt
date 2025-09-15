@@ -1,0 +1,7 @@
+pandas
+azure-identity
+azure-storage-blob
+tenacity
+dash
+plotly
+
